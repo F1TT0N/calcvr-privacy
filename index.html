@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalcVR - Calculator for Meta Quest</title>
+    <meta name="description" content="CalcVR - A free calculator app for Meta Quest. Basic and Scientific modes with hand tracking support. No ads, no data collection.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #060a1f;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding: 40px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse 600px 500px at 20% 40%, rgba(40, 160, 80, 0.08), transparent),
+                radial-gradient(ellipse 500px 400px at 50% 70%, rgba(80, 120, 200, 0.06), transparent),
+                radial-gradient(ellipse 600px 500px at 80% 30%, rgba(100, 220, 130, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        .logo-icon {
+            width: 160px;
+            height: 160px;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon svg { width: 100%; height: 100%; }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 12px;
+            background: linear-gradient(135deg, #64dc82, #5078c8, #28a050);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle { font-size: 1.3rem; color: #888; letter-spacing: 6px; margin-bottom: 30px; }
+
+        .tagline { font-size: 1.1rem; color: #aaa; max-width: 600px; line-height: 1.8; margin-bottom: 40px; }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #28a050, #5078c8);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(40, 160, 80, 0.4);
+        }
+
+        .divider { width: 300px; height: 2px; background: linear-gradient(90deg, transparent, #28a050, transparent); margin: 0 auto; }
+
+        .features { padding: 80px 20px; max-width: 1100px; margin: 0 auto; }
+
+        .features h2, .modes h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 60px;
+            letter-spacing: 4px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 35px 30px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(40, 160, 80, 0.3);
+        }
+
+        .feature-icon { font-size: 2.2rem; margin-bottom: 16px; }
+        .feature-card h3 { font-size: 1.2rem; color: #fff; margin-bottom: 10px; }
+        .feature-card p { color: #888; line-height: 1.7; font-size: 0.95rem; }
+
+        .modes { padding: 60px 20px 80px; text-align: center; }
+
+        .mode-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .mode-tag {
+            padding: 10px 24px;
+            border: 1px solid rgba(40, 160, 80, 0.3);
+            border-radius: 30px;
+            color: #bbb;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            background: rgba(40, 160, 80, 0.05);
+        }
+
+        .footer {
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-links { margin-bottom: 20px; }
+
+        .footer-links a {
+            color: #64dc82;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover { text-decoration: underline; }
+        .footer p { color: #555; font-size: 0.85rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; letter-spacing: 6px; }
+            .subtitle { font-size: 1rem; letter-spacing: 4px; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="logo-icon">
+            <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1a3c8c"/>
+                        <stop offset="100%" style="stop-color:#2450b4"/>
+                    </linearGradient>
+                    <linearGradient id="dg" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#64dc82"/>
+                        <stop offset="100%" style="stop-color:#28a050"/>
+                    </linearGradient>
+                    <filter id="gl">
+                        <feGaussianBlur stdDeviation="4" result="b"/>
+                        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <rect x="10" y="10" width="140" height="140" rx="24" fill="url(#bg)" filter="url(#gl)"/>
+                <!-- Calculator body -->
+                <rect x="30" y="25" width="100" height="115" rx="12" fill="#e8e8f0"/>
+                <!-- Display -->
+                <rect x="38" y="33" width="84" height="28" rx="6" fill="#1a1a24"/>
+                <text x="115" y="54" fill="#64dc82" font-family="monospace" font-size="16" font-weight="bold" text-anchor="end">42</text>
+                <!-- Buttons row 1 -->
+                <rect x="38" y="68" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="60" y="68" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="82" y="68" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="104" y="68" width="18" height="18" rx="3" fill="#5078c8"/>
+                <!-- Buttons row 2 -->
+                <rect x="38" y="90" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="60" y="90" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="82" y="90" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="104" y="90" width="18" height="18" rx="3" fill="#5078c8"/>
+                <!-- Buttons row 3 -->
+                <rect x="38" y="112" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="60" y="112" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="82" y="112" width="18" height="18" rx="3" fill="#ddd"/>
+                <rect x="104" y="112" width="18" height="18" rx="3" fill="#28a050"/>
+            </svg>
+        </div>
+        <h1>CALCVR</h1>
+        <div class="subtitle">CALCULATOR FOR VR</div>
+        <p class="tagline">
+            A free, lightweight calculator for Meta Quest. Switch between Basic and Scientific
+            modes with full hand tracking support. No ads, no data collection &mdash; just math.
+        </p>
+        <a href="#features" class="cta-btn">EXPLORE FEATURES</a>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="features" id="features">
+        <h2>FEATURES</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">&#129518;</div>
+                <h3>Basic Mode</h3>
+                <p>All the essentials: addition, subtraction, multiplication, division, and percentage. Clean layout designed for quick calculations in VR.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128300;</div>
+                <h3>Scientific Mode</h3>
+                <p>Advanced functions including sin, cos, tan, logarithms, square root, power, factorial, and constants like &pi; and e. Switch modes with one tap.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#9995;</div>
+                <h3>Hand Tracking</h3>
+                <p>Full hand tracking V2.0 support. Use your hands naturally to press buttons &mdash; no controllers required. Pinch to tap, just like a real calculator.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128187;</div>
+                <h3>Native 2D Panel</h3>
+                <p>Runs as a native Meta Quest 2D system panel. Lightweight, fast, and always accessible alongside your other VR apps.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128274;</div>
+                <h3>Privacy First</h3>
+                <p>Zero data collection. No analytics, no tracking, no network requests. Everything stays on your device. Your calculations are yours alone.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#127873;</div>
+                <h3>Completely Free</h3>
+                <p>No ads, no in-app purchases, no premium tiers. CalcVR is 100% free with all features unlocked from day one.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="modes">
+        <h2>SCIENTIFIC FUNCTIONS</h2>
+        <div class="mode-tags">
+            <span class="mode-tag">sin / cos / tan</span>
+            <span class="mode-tag">asin / acos / atan</span>
+            <span class="mode-tag">ln / log</span>
+            <span class="mode-tag">&radic; Square Root</span>
+            <span class="mode-tag">x&sup2; / x&#x207F;</span>
+            <span class="mode-tag">n! Factorial</span>
+            <span class="mode-tag">&pi; Pi</span>
+            <span class="mode-tag">e Euler</span>
+            <span class="mode-tag">% Percentage</span>
+            <span class="mode-tag">+/&minus; Toggle Sign</span>
+            <span class="mode-tag">DEG / RAD</span>
+            <span class="mode-tag">15-Digit Precision</span>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="mailto:psopala93@gmail.com">Contact</a>
+        </div>
+        <p>&copy; 2026 Anwar Studio Official. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
